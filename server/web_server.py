@@ -2,17 +2,13 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from uuid import uuid4
 
-# path stuff bc the player file is in parent folder and relative paths don't work with python3 imports
-import os, sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-
-from player import Player
-from main import serverHandler
+from serverhandler.player import Player
+from serverhandler.serverHandler import ServerHandler
 
 app = Flask(__name__)
 app.secret_key = str(uuid4())
+
+serverhandler = ServerHanlder()
 
 @app.route("/")
 def hello_world():
