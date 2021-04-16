@@ -3,28 +3,13 @@
 {% block head %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js" integrity="sha512-eVL5Lb9al9FzgR63gDs1MxcDS2wFu3loYAgjIH0+Hg38tCS8Ag62dwKyH+wzDb+QauDpEZjXbMn11blw8cbTJQ==" crossorigin="anonymous"></script>   
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-
-{% if player != None %}
-    <script src="{{ url_for('static', filename='js/room.js') }}" ></script>
-{% endif %}
-
 {% endblock %}
 
 {% block body %}
-<p>You are in room <strong>{{ room.name }}</strong> with id <strong>{{ room.roomId }}</strong></p><br>
+<strong>The room {{ room.name }} is full. You can't join!</strong>
 
-{% if player == None %}
-<form action="#" method="POST" >
-    <input type="text" id="txtName" name="usr_name"><br>
-    <button type="submit" value="submit" id="btnJoin">JOIN</button>
-</form>
-{% else %}
-    <p>Your name is <strong>{{ player.name }}</strong></p>
-{% endif %}
+<p>Room members: </p> 
 
-<div>
-    <div id="current_member_count">0</div> / {{room.max_players}}
-</div>
 <ul id="memberList" >
     {% if members != None %}
         {% for name, leader in members %}
@@ -36,5 +21,4 @@
         {% endfor %}
     {% endif %}
 </ul>
-
 {% endblock %}

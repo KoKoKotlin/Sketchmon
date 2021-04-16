@@ -32,8 +32,11 @@ class Room:
         self.players.remove(player)
 
     def get_member_names(self):
-        return {"members": [{"name": player.name, "leader": player == self.leader} for player in self.players]}
+        return {"members": [(player.name, player == self.leader) for player in self.players]}
     
+    def is_full(self):
+        return len(self.players) >= self.max_players
+
     def __repr__(self):
         return f"{self.__class__.__name__}(name='{self.name}', roomId='{self.roomId}, leader={self.leader.name}')"
 

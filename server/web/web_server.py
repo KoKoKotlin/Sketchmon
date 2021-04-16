@@ -36,6 +36,12 @@ def room(roomId=None):
 @app.route("/rooms/<roomId>/login", methods=["GET", "POST"])
 def roomLogin(roomId):
     # if usr has clicked submit button or is already logged in
+    room = serverHandler.get_room_by_id(roomId)
+    
+    if room.is_full():
+        members = room.get_member_names()["members"]
+        return render_template("room_full.html", room=room, members=members)
+    
     if request.method == "POST":
         name = request.form["usr_name"]        
         login_player(name, roomId)
@@ -59,7 +65,7 @@ def roomCreate(roomId):
             name = request.form["usr_name"]
             player = login_player(name, roomId)
         
-        max_players = request.form["max_players"]
+        max_players = int(request.form["max_players"])
         room_name = request.form["room_name"]
         
         # create a new room

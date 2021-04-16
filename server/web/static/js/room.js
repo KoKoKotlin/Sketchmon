@@ -10,7 +10,9 @@ function updateMembers(members) {
     
     members.forEach(member => {    
         // add all members back
-        memberList.append(`<li>${member.name}</li>`);
+        
+        if(member[1]) memberList.append(`<li>${member[0]} 👑</li>`);
+        else memberList.append(`<li>${member[0]}</li>`);
     });
     
     $("#current_member_count").text(`${members.length}`); 
@@ -34,6 +36,7 @@ function establishConnection() {
         socket.on("connect", () => {});
 
         socket.on("memberChange", (memberList) => {
+            console.log(memberList)
             updateMembers(memberList.members);
         });
     });
