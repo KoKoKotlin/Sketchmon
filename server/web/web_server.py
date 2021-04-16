@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from uuid import uuid4
 
@@ -19,7 +19,7 @@ def hello_world():
     return render_template("index.html")
 
 # display the room and the members of the room and prompt login if player isn't logged in
-@app.route("/rooms/<roomId>", methods=["GET", "POST"])
+@app.route("/rooms/<roomId>")
 def room(roomId=None):
     # room doesn't exist yet
     room = serverHandler.get_room_by_id(roomId)
@@ -27,19 +27,26 @@ def room(roomId=None):
 
     if room == None:
         return redirect(url_for("roomCreate", roomId=roomId))
-
-    # if usr has clicked submit button or is already logged in
-    if request.method == "POST" or player != None:
-        
-        if player == None:
-            # create new player instance and save it in session
-            name = request.form["usr_name"]
-            login_player(name, roomId)
-        
-        return render_template("room.html", room=room, player=player)
-    # new player
+    
+    if player != None:
+        return render_template("room.html", room=room, player=player, members=None)
     else:
-        return render_template("room.html", room=room, player=None)
+        return redirect(url_for("roomLogin", roomId=roomId))
+
+@app.route("/rooms/<roomId>/login", methods=["GET", "POST"])
+def roomLogin(roomId):
+    # if usr has clicked submit button or is already logged in
+    if request.method == "POST":
+        name = request.form["usr_name"]        
+        login_player(name, roomId)
+        return redirect(url_for("room", roomId=roomId))
+    
+    members = serverHandler.get_room_by_id(roomId).get_member_names()["members"]
+    return render_template("room.html", room=room, player=None, members=members)
+
+
+def onPlayerJoinRoom():
+    socketio.send()
 
 # create a new room and login player if he hasn't yet
 @app.route("/rooms/<roomId>/create", methods=["GET", "POST"])
@@ -65,14 +72,13 @@ def roomCreate(roomId):
         return render_template("create_room.html", id=roomId, player=player)
 
 def login_player(name, roomId):
-    player = Player(request.remote_addr, name, str(uuid4()), None) # create a new player object
-    session["player"] = player
+    player = Player(request.remote_addr, name, None) # create a new player object
     serverHandler.add_player(player, roomId)
 
     return player
 
 def get_player():
-    return session["player"] if "player" in session else None
+    return serverHandler.get_player_by_ip(request.remote_addr)
 
 # get all member names of a existing room else empty json object
 @app.route("/rooms/<roomId>/members")
@@ -88,22 +94,29 @@ def roomMembers(roomId=None):
 
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-@socketio.on('connect')
+@socketio.on("connect")
 def connected():
-    print('New user ' + request.remote_addr)
+    print("New user connected!")
+    player = serverHandler.get_player_by_ip(request.remote_addr)
 
-"""
+    emit("meta", {"username": player.name, "roomId": player.current_room.roomId})
+
 @socketio.on("join")
 def join(data):
-    print(f"User: {request.remote_addr}")
+    player = serverHandler.get_player_by_ip(request.remote_addr)
+    
+    print(f"User ({player.name}) successfully joined room with id ({data['room']})")
     join_room(data["room"])
-    send({event: "join_player", username: data["username"]})
 
-@socketio.on("leave")
-def leave(data):
-    pass
-"""
+    emit("memberChange", serverHandler.get_room_by_id(data["room"]).get_member_names())
 
+@socketio.on("disconnect")
+def leave():
+    player = get_player()
+    print(f"Player left: {player}")
+    
+    serverHandler.handle_disconnect(player)
+    
 if __name__ == "__main__":
     socketio.run(app, debug=True, host="0.0.0.0")
     
