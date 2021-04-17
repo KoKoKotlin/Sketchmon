@@ -13,15 +13,6 @@
 {% block body %}
 <p>You are in room <strong>{{ room.name }}</strong> with id <strong>{{ room.roomId }}</strong></p><br>
 
-{% if player == None %}
-<form action="#" method="POST" >
-    <input type="text" id="txtName" name="usr_name"><br>
-    <button type="submit" value="submit" id="btnJoin">JOIN</button>
-</form>
-{% else %}
-    <p>Your name is <strong>{{ player.name }}</strong></p>
-{% endif %}
-
 <div>
     <div id="current_member_count">0</div> / {{room.max_players}}
 </div>

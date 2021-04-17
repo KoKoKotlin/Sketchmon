@@ -1,4 +1,4 @@
-from room import Room
+from serverhandler.room import Room
 
 class ServerHandler:
     def __init__(self):

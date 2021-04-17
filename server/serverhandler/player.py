@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from room import Room
+from serverhandler.room import Room
 
 @dataclass(frozen=False, init=True)
 class Player:
