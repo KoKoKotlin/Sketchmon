@@ -3,6 +3,14 @@ function load() {
     $("#username-wrapper").hide();
     $("#roomId-wrapper").hide();
 
+    const canvas = new DrawingBoard.Board("canvas");
+
+    /*
+    canvas.ev.bind("board:drawing", () => {
+        console.log(canvas.getImg());
+    });
+    */
+   
     const sio = io();
     
     $("#chat-input").keypress((e) => {
@@ -28,9 +36,9 @@ function load() {
 
     sio.on("msg", (data) => {
         if(data.username !== "") {
-            $("#chat").append(`<p><strong>${data.username}</strong>: ${data.msg}</p>`)
+            $("#chat").append(`<p id="chat-msg"><strong id="chat-msg-username">${data.username}</strong>: ${data.msg}</p>`)
         } else {
-            $("#chat").append(`<p style="color: red;">${data.msg}</p>`)
+            $("#chat").append(`<p id="chat-system-msg">${data.msg}</p>`)
         }
     });
 

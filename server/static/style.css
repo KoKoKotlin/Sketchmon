@@ -1,0 +1,52 @@
+body {
+    background-color: #404040;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 15px;
+}
+
+#member-list {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    font-size: 16px;
+    list-style-type: lower-greek;
+}
+
+#chat {
+    width: inherit;
+    height: 500px;
+    margin: 5px;
+    border: solid 1px;
+    border-radius: 2px;
+    overflow-y: auto;
+    background-color: black;
+    color: white;
+}
+
+#chat-msg {
+    margin: auto;
+}
+
+#chat-msg-username {
+    color: blueviolet;
+}
+
+#chat-input {
+    width: 400px;
+    margin: 5px;
+}
+
+#canvas {
+    float: right;
+    width: 3500px; 
+    height: 800px;
+}
+
+#left {
+    align-content: left;
+    display: block;
+    width: 1500px;
+}
+
+#content {
+    display: flex;
+}
