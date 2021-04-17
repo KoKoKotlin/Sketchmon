@@ -66,6 +66,15 @@ def join(sid, data):
         notify_member_change(room.roomId)
         return { "success": True, "roomId": room.roomId, "new_room": False }
 
+@sio.event
+def message(sid, data):
+    print(f"User ({sid}) wants to send msg ({data})")
+
+    # check if player is logged in and has joined a room
+    if (player := serverhandler.get_player_by_sid(sid)) != None \
+   and (roomId := serverhandler.get_room_by_player(sid)) != None:
+        print(f"Broadcasting msg ({data}) of player ({player}) to room ({roomId})")
+        sio.emit("msg", {"username": player.name, "msg": data}, to=roomId)
 
 def notify_member_change(roomId):
     room = serverhandler.get_room_by_id(roomId)

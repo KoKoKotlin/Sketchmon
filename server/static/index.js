@@ -2,8 +2,19 @@
 function load() {
     $("#username-wrapper").hide();
     $("#roomId-wrapper").hide();
-    
+
     const sio = io();
+    
+    $("#chat-input").keypress((e) => {
+        const key = e.which;
+        const ENTER_KEY_CODE = 13;
+
+        if(key == ENTER_KEY_CODE)  
+         {
+           sendChatMsg(sio);
+           return false;  
+         }
+    });
 
     sio.on("connect", () => {
         console.log("connected");
@@ -14,6 +25,14 @@ function load() {
     });
 
     sio.on("room_member_change", (data) => updateMembers(data.members));
+
+    sio.on("msg", (data) => {
+        if(data.username !== "") {
+            $("#chat").append(`<p><strong>${data.username}</strong>: ${data.msg}</p>`)
+        } else {
+            $("#chat").append(`<p style="color: red;">${data.msg}</p>`)
+        }
+    });
 
     $("#login").on("click", () => login(sio));
 
@@ -80,6 +99,13 @@ function updateMembers(members) {
         if (member.leader) memberList.append(`<li>${member.name} 👑</li>`);
         else memberList.append(`<li>${member.name}</li>`);
     });
+}
+
+function sendChatMsg(sio) {
+    const msg = $("#chat-input").val();
+    $("#chat-input").val("");
+
+    sio.emit("message", msg);
 }
 
 load();
