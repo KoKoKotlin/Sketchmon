@@ -18,7 +18,7 @@ class Room:
         self.roomId = roomId                # unique id for the room
 
     def add_player(self, player):
-        player.current_room = self
+        player.roomId = self.roomId
         
         if player not in self.players:
             self.players.append(player)
@@ -38,6 +38,6 @@ class Room:
         return len(self.players) >= self.max_players
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(name='{self.name}', roomId='{self.roomId}, leader={self.leader.name}')"
+        return f"{self.__class__.__name__}(name='{self.name}', roomId='{self.roomId}', leader='{self.leader.name}')"
 
 GAME_STATES = ["playing", "waiting"]

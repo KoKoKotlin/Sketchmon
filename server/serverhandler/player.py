@@ -5,4 +5,4 @@ from serverhandler.room import Room
 class Player:
     sid: str                # session id of socketio
     name: str               # display name of a player
-    room_id: str            # room id of the room the player is currently in
+    roomId: str            # room id of the room the player is currently in

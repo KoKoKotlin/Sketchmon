@@ -24,14 +24,18 @@ class ServerHandler:
         
         return None
     
-    def handle_disconnect(self, player):
-        print(f"Handle disconnect of player {player}")
+    def handle_disconnect(self, sid):
+        player = self.get_player_by_sid(sid)
 
-        for room in self.rooms:
-            if player in room.players:
-                room.remove_player(player)
+        # if the player was logged in
+        if player != None:
+            print(f"Handle disconnect of player {player}")
 
-        self.delete_player(player)
+            for room in self.rooms:
+                if player in room.players:
+                    room.remove_player(player)
+
+            self.delete_player(player)
     
     def check_player_login(self, sid):
         return self.get_player_by_sid(sid) != None
@@ -47,7 +51,7 @@ class ServerHandler:
         room.add_player(leader)
         room.leader = leader
         
-        print(f"Create a new room {room} and leader {leader}")
+        print(f"Create a new room {room} with leader {leader}")
         
         self.rooms.append(room)
         
@@ -58,6 +62,10 @@ class ServerHandler:
             if room.roomId == roomId: return room
         
         return None
+    
+    def get_room_by_player(self, sid):
+        player = self.get_player_by_sid(sid)
+        return player.roomId
 
     def remove_player(self, player, roomId):
         print(f"Remove player {player} from room {room}")

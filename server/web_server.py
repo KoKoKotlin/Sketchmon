@@ -20,6 +20,12 @@ def connect(sid, environ): # sid: session id, environ: dict containing client re
 def disconnect(sid):
     print(f"Client ({sid}) disconnected")
 
+    # handle player disconnect
+    roomId = serverhandler.get_room_by_player(sid)
+    serverhandler.handle_disconnect(sid)
+    
+    notify_member_change(roomId)
+
 @sio.event
 def login(sid, data):
     # login new user with given user name
@@ -51,12 +57,16 @@ def join(sid, data):
         # create a new room and put player as leader
         new_room = serverhandler.create_room("", 20, sid, data["roomId"])
         
-        sio.emit("room_member_change", new_room.get_member_list(), to=new_room.roomId)
+        notify_member_change(new_room.roomId)
         return { "success": True, "roomId": new_room.roomId, "new_room": True }
     else:
         # put player into existing room
         serverhandler.add_player_to_room(sid, data["roomId"])
 
-        sio.emit("room_member_change", room.get_member_list(), to=room.roomId)
+        notify_member_change(room.roomId)
         return { "success": True, "roomId": room.roomId, "new_room": False }
-    
+
+
+def notify_member_change(roomId):
+    room = serverhandler.get_room_by_id(roomId)
+    sio.emit("room_member_change", room.get_member_list(), to=room.roomId)
