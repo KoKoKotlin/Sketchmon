@@ -5,22 +5,43 @@ class ServerHandler:
         self.players = []
         self.rooms = []
     
-    def add_player(self, player, roomId):
-        print(f"Add player {player} to room {roomId}")
+    def add_player(self, player):
+        print(f"Login a new player {player}")
 
-        if player not in self.players: self.players.append(player)
-
-        for room in self.rooms:
-            if room.roomId == roomId:
-                room.add_player(player)
+        self.players.append(player)
     
-    def get_room_by_id(self, roomId):
-        for room in self.rooms:
-            if room.roomId == roomId: return room
+    def add_player_to_room(self, sid, roomId):
+        player = self.get_player_by_sid(sid)
+        room = self.get_room_by_id(roomId)
+        
+        print(f"Adding player ({player}) to room ({room})")
+        
+        room.add_player(player)
+
+    def get_player_by_sid(self, player_sid):
+        for player in self.players:
+            if player.sid == player_sid: return player
         
         return None
     
-    def create_room(self, name, max_players, leader, roomId):
+    def handle_disconnect(self, player):
+        print(f"Handle disconnect of player {player}")
+
+        for room in self.rooms:
+            if player in room.players:
+                room.remove_player(player)
+
+        self.delete_player(player)
+    
+    def check_player_login(self, sid):
+        return self.get_player_by_sid(sid) != None
+
+    def delete_player(self, player):
+        print(f"Deleting player {player}")
+        self.players.remove(player)
+    
+    def create_room(self, name, max_players, sid, roomId):
+        leader = self.get_player_by_sid(sid)
         room = Room(name, max_players, roomId)
         
         room.add_player(leader)
@@ -29,13 +50,15 @@ class ServerHandler:
         print(f"Create a new room {room} and leader {leader}")
         
         self.rooms.append(room)
+        
+        return room
     
-    def get_player_by_ip(self, player_ip):
-        for player in self.players:
-            if player.ip == player_ip: return player
+    def get_room_by_id(self, roomId):
+        for room in self.rooms:
+            if room.roomId == roomId: return room
         
         return None
-    
+
     def remove_player(self, player, roomId):
         print(f"Remove player {player} from room {room}")
 
@@ -48,17 +71,3 @@ class ServerHandler:
                 if len(room.players) == 0:
                     print(f"Room {roomId} is now empty. Deleting...")
                     self.rooms.remove(room)
-                
-
-    def delete_player(self, player):
-        print(f"Deleting player {player}")
-        self.players.remove(player)
-    
-    def handle_disconnect(self, player):
-        print(f"Handle disconnect of player {player}")
-
-        for room in self.rooms:
-            if player in room.players:
-                room.remove_player(player)
-
-        self.delete_player(player)

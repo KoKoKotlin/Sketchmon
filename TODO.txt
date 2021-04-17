@@ -1,0 +1,3 @@
+* login with username
+* rooms
+* drawing / chat / game

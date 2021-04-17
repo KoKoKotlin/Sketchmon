@@ -7,7 +7,23 @@
 </head>
 <body>
     <h1>Sketchmon</h1>
+    
+    <div id="username_form">
+        <p>Username: </p>
+        <input id="user_name" type="text"><br>
+        <button id="login">Login</button>
+    </div>
+    <div id="username-wrapper">Logged in as <strong id="username"></strong></div>
+    
+    <div id="room-form">
+        <p>Room Id: (If left empyt, creates a new room with random id)</p>
+        <input id="room_id" type="text"><br>
+        <button id="join">Join</button>
+    </div>
+    <div id="roomId-wrapper">You are currently in room <strong id="roomId"></strong></div>
+
     <script src="https://cdn.socket.io/3.1.3/socket.io.min.js" integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="/index.js"></script>
 </body>
 </html>
