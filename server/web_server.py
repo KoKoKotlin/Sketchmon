@@ -43,12 +43,15 @@ def join(sid, data):
     # if the player is logged in -> put him into the sio room and serverhandler room
     room = serverhandler.get_room_by_id(data["roomId"])    
 
+    # put player into sio room
     sio.enter_room(sid, data["roomId"])
 
+    # create room for the game logic
     if room == None:
         # create a new room and put player as leader
         new_room = serverhandler.create_room("", 20, sid, data["roomId"])
-
+        
+        sio.emit("room_member_change", new_room.get_member_list(), to=new_room.roomId)
         return { "success": True, "roomId": new_room.roomId, "new_room": True }
     else:
         # put player into existing room

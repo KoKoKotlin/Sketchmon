@@ -13,9 +13,7 @@ function load() {
         console.log("disconnected");
     });
 
-    sio.on("room_member_change", (data) => {
-        console.log(data);
-    })
+    sio.on("room_member_change", (data) => updateMembers(data.members));
 
     $("#login").on("click", () => login(sio));
 
@@ -65,13 +63,22 @@ function join(sio) {
     if(roomId === "") roomId = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
     
     sio.emit("join", {roomId: roomId}, (res) => {
-        console.log(res);
-
         if(res.success) {
             roomFormToggle(true, res.roomId, res.new_room);
         } else {
             alert(res.reason);
         }
+    });
+}
+
+function updateMembers(members) {
+    const memberList = $("#member-list");
+
+    memberList.empty();
+
+    members.forEach(member => {
+        if (member.leader) memberList.append(`<li>${member.name} 👑</li>`);
+        else memberList.append(`<li>${member.name}</li>`);
     });
 }
 
