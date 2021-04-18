@@ -19,7 +19,7 @@
             <div id="username-wrapper">Logged in as <strong id="username"></strong></div>
             
             <div id="room-form">
-                <p>Room Id: (If left empyt, creates a new room with random id)</p>
+                <p>Room Id:</p>
                 <input id="room_id" type="text"><br>
                 <button id="join">Join</button>
             </div>
@@ -37,10 +37,17 @@
                 </div>
                 <input placeholder  ="Type here..." type="text" id="chat-input">
             </div>
+            <button id="start">Start Round!</button>
         </div>
 
-        <div id="canvas"></div>
-        <div style="width: 1000px; height: 1000px;" id="canvas-mirror"></div>
+        <div id="canvas-wrapper">
+            <div id="meta-info">
+                <div id="timer"></div>
+                <div id="name"></div>
+            </div>
+            <div id="canvas"></div>
+            <div id="poke-img-wrapper"></div>
+        </div>
     </div>
     
     

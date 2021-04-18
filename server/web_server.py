@@ -11,7 +11,7 @@ app = socketio.WSGIApp(sio,
     }
 )
 
-serverhandler = ServerHandler()
+serverhandler = ServerHandler(sio)
 
 @sio.event
 def connect(sid, environ): # sid: session id, environ: dict containing client request details 
@@ -92,3 +92,24 @@ def img(sid, imgData):
     
     if player != None:
         sio.emit("img", imgData, to=player.roomId)
+
+@sio.event
+def start(sid, data):
+    player = serverhandler.get_player_by_sid(sid)
+
+    if player != None:
+        room = serverhandler.get_room_by_id(player.roomId)
+
+        if room != None and len(room.players) >= 2:
+            
+            sio.emit("msg", {"msg": "New round starting soon!"})
+            
+            room.start()
+            return ""
+        else:
+            return "You have to be in a room with at least 2 players!"
+
+@sio.event
+def get_sid(sid, data):
+    print(f"User ({sid}) tries to get his sid")
+    return sid

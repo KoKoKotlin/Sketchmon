@@ -1,9 +1,10 @@
 from serverhandler.room import Room
 
 class ServerHandler:
-    def __init__(self):
+    def __init__(self, sio):
         self.players = []
         self.rooms = []
+        self.sio = sio
     
     def add_player(self, player):
         print(f"Login a new player {player}")
@@ -50,7 +51,7 @@ class ServerHandler:
     
     def create_room(self, name, max_players, sid, roomId):
         leader = self.get_player_by_sid(sid)
-        room = Room(name, max_players, roomId)
+        room = Room(name, max_players, roomId, self.sio)
         
         room.add_player(leader)
         room.leader = leader

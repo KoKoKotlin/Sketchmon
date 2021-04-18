@@ -2,6 +2,10 @@
 (() => {
 function load() {
     let currentState = "spectating";
+    
+    let sid = "";
+    let pokemonName = "";
+    let timerTask = null;
 
     $("#username-wrapper").hide();
     $("#roomId-wrapper").hide();
@@ -21,11 +25,6 @@ function load() {
 
     const sio = io();
    
-    canvas.ev.bind("board:drawing", () => {
-        const imgData = base64Compress(canvas.getImg());
-        sio.emit("img", imgData);
-    });    
-   
     $("#chat-input").keypress((e) => {
         const key = e.which;
         const ENTER_KEY_CODE = 13;
@@ -39,6 +38,11 @@ function load() {
 
     sio.on("connect", () => {
         console.log("connected");
+
+        sio.emit("get_sid", "", (sid_) => { 
+            sid = sid_; 
+            console.log("Got sid " + sid);
+        });
     });
 
     sio.on("disconnect", () => {
@@ -48,7 +52,7 @@ function load() {
     sio.on("room_member_change", (data) => updateMembers(data.members));
 
     sio.on("msg", (data) => {
-        if(data.username !== "") {
+        if(data.username !== undefined) {
             $("#chat").append(`<p id="chat-msg"><strong id="chat-msg-username">${data.username}</strong>: ${data.msg}</p>`)
         } else {
             $("#chat").append(`<p id="chat-system-msg">${data.msg}</p>`)
@@ -60,9 +64,60 @@ function load() {
             canvas.setImg(base64Decompress(data));
     });
 
+    sio.on("deltaTime", (data) => {
+        // update display
+        $("#timer").text(`Timer: ${Math.floor(parseFloat(data.len) - parseFloat(data.deltaTime))}`);
+    });
+
+    sio.on("start_round", (data) => {
+        deltaTime = 0.0;
+        // update memberlist icons
+
+        // clear canvas
+        canvas.reset();
+
+        // set state
+        if(data.drawing_player === sid) { 
+            currentState = "drawing";
+            $("#name").text(data.pokemon.name);
+            canvas.enable();
+
+            timerTask = setInterval(() => {
+                const imgData = base64Compress(canvas.getImg());
+                sio.emit("img", imgData);        
+            }, 1000);
+        } else {
+            currentState = "guessing";
+            $("#name").text("_ ".repeat(data.pokemon.name.length));
+            canvas.disable();
+        }
+    });
+
+    sio.on("end_of_round", (data) => {
+        deltaTime = 0.0;
+        // show information about round
+
+        // clear the interval timer
+        if(timerTask !== null) {
+            clearInterval(timerTask);
+            timerTask = null;
+        }
+    });
+    
+    sio.on("end_of_game", (data) => {
+        // show winners
+    });
+
+
     $("#login").on("click", () => login(sio));
 
     $("#join").on("click", () => join(sio));
+
+    $("#start").on("click", () => {
+        sio.emit("start", "", (err) => {
+            if(err !== "") alert(err);
+        });
+    });
 }
 
 function usernameFormToggle(hide=true, name) {

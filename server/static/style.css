@@ -14,7 +14,7 @@ body {
 }
 
 #chat {
-    width: inherit;
+    width: 400px;
     height: 500px;
     margin: 5px;
     border: solid 1px;
@@ -39,8 +39,25 @@ body {
 
 #canvas {
     float: right;
-    width: 3500px; 
+    width: 1400px; 
     height: 800px;
+}
+
+#meta-info {
+    display: flex;
+    padding: 5px;
+    justify-content: center;
+    font-size: 25px;
+}
+
+#timer {
+    text-align: center;
+    margin-right: 500px;
+}
+
+#name {
+    text-align: center;
+
 }
 
 #left {
