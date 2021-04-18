@@ -79,7 +79,9 @@ def message(sid, data):
 
 def notify_member_change(roomId):
     room = serverhandler.get_room_by_id(roomId)
-    sio.emit("room_member_change", room.get_member_list(), to=room.roomId)
+
+    if room != None:
+        sio.emit("room_member_change", room.get_member_list(), to=room.roomId)
 
 def escape_user_input(msg):
     return html.escape(msg)

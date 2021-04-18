@@ -26,7 +26,7 @@ class Room:
     def remove_player(self, player):
         player.current_room = None
 
-        if player == self.leader:
+        if player == self.leader and len(self.players) > 1:
             leader = choice(self.players)
 
         self.players.remove(player)
@@ -36,6 +36,9 @@ class Room:
     
     def is_full(self):
         return len(self.players) >= self.max_players
+
+    def is_empty(self):
+        return len(self.players) == 0
 
     def __repr__(self):
         return f"{self.__class__.__name__}(name='{self.name}', roomId='{self.roomId}', leader='{self.leader.name}')"

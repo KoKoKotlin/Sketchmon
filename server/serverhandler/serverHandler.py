@@ -35,6 +35,10 @@ class ServerHandler:
                 if player in room.players:
                     room.remove_player(player)
 
+                    if room.is_empty():
+                        print(f"Room ({room.roomId}) is empty. Deleting...")
+                        self.rooms.remove(room)
+
             self.delete_player(player)
     
     def check_player_login(self, sid):
@@ -65,6 +69,10 @@ class ServerHandler:
     
     def get_room_by_player(self, sid):
         player = self.get_player_by_sid(sid)
+
+        if player == None:
+            return None
+
         return player.roomId
 
     def remove_player(self, player, roomId):

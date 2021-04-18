@@ -7,7 +7,6 @@ function load() {
     $("#roomId-wrapper").hide();
 
     const canvas = new DrawingBoard.Board("canvas", {webStorage: false});
-    canvas.disable();
 
     // add disable and enable methods to the canvas object
     canvas.disable = () => {
@@ -18,6 +17,8 @@ function load() {
         $("#canvas").css("pointer-events", "")
     };
  
+    canvas.disable();
+
     const sio = io();
    
     canvas.ev.bind("board:drawing", () => {
@@ -130,7 +131,7 @@ function sendChatMsg(sio) {
     const msg = $("#chat-input").val();
     $("#chat-input").val("");
 
-    sio.emit("message", msg);
+    if(/\S/.test(msg)) sio.emit("message", msg);
 }
 
 function base64Compress(imgCur) {
