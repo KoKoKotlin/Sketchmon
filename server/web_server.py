@@ -83,3 +83,10 @@ def notify_member_change(roomId):
 
 def escape_user_input(msg):
     return html.escape(msg)
+
+@sio.event
+def img(sid, imgData):
+    player = serverhandler.get_player_by_sid(sid)
+    
+    if player != None:
+        sio.emit("img", imgData, to=player.roomId)

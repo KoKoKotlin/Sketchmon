@@ -1,18 +1,30 @@
+
 (() => {
 function load() {
+    let currentState = "spectating";
+
     $("#username-wrapper").hide();
     $("#roomId-wrapper").hide();
 
-    const canvas = new DrawingBoard.Board("canvas");
+    const canvas = new DrawingBoard.Board("canvas", {webStorage: false});
+    canvas.disable();
 
-    /*
-    canvas.ev.bind("board:drawing", () => {
-        console.log(canvas.getImg());
-    });
-    */
-   
+    // add disable and enable methods to the canvas object
+    canvas.disable = () => {
+        $("#canvas").css("pointer-events", "none");
+    };
+
+    canvas.enable = () => {
+        $("#canvas").css("pointer-events", "")
+    };
+ 
     const sio = io();
-    
+   
+    canvas.ev.bind("board:drawing", () => {
+        const imgData = base64Compress(canvas.getImg());
+        sio.emit("img", imgData);
+    });    
+   
     $("#chat-input").keypress((e) => {
         const key = e.which;
         const ENTER_KEY_CODE = 13;
@@ -40,6 +52,11 @@ function load() {
         } else {
             $("#chat").append(`<p id="chat-system-msg">${data.msg}</p>`)
         }
+    });
+
+    sio.on("img", (data) => {
+        if(currentState != "drawing")
+            canvas.setImg(base64Decompress(data));
     });
 
     $("#login").on("click", () => login(sio));
@@ -114,6 +131,23 @@ function sendChatMsg(sio) {
     $("#chat-input").val("");
 
     sio.emit("message", msg);
+}
+
+function base64Compress(imgCur) {
+    let compressedImg = imgCur.split('').reduce((o, c) => {
+        if (o[o.length - 2] === c && o[o.length - 1] < 35) o[o.length - 1]++;
+        else o.push(c, 0);
+        return o;
+    },[]).map(_ => typeof _ === 'number' ? _.toString(36) : _).join('');
+
+    return compressedImg;
+}
+
+function base64Decompress(compressedImgCur) {
+    let decompressedImgCur = compressedImgCur
+    .split('').map((c,i,a)=>i%2?undefined:new Array(2+parseInt(a[i+1],36)).join(c)).join('');
+
+    return decompressedImgCur;
 }
 
 load();
